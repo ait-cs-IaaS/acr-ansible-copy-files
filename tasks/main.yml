@@ -1,0 +1,29 @@
+---
+- name: Check if source directories exist on localhost
+  ansible.builtin.stat:
+    path: '{{ files_basedir }}/{{ item }}'
+  with_items: "{{ files_subfolders }}"
+  delegate_to: localhost
+  register: dir_stats
+
+- name: Ensure destination folder exists
+  become: true
+  ansible.builtin.file:
+    path: "{{ files_destination }}"
+    owner: "{{ files_owner }}"
+    group: "{{ files_owner }}"
+    state: directory
+    recurse: true
+    mode: "0755"
+
+- name: Deploy Desktop Files
+  become: true
+  ansible.builtin.copy:
+    src: '{{ files_basedir }}/{{ item.item }}/'
+    dest: '{{ files_destination }}'
+    owner: '{{ files_owner }}'
+    group: '{{ files_owner }}'
+    mode: preserve
+    follow: true
+  with_items: '{{ dir_stats.results }}'
+  when: item.stat.exists

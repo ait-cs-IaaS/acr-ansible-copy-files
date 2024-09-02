@@ -1,0 +1,6 @@
+---
+files_basedir: /path/on/localhost/
+files_subfolders:
+  - subdir
+files_destination: /path/on/remote/machine
+files_owner: username
